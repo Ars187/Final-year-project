@@ -10,11 +10,10 @@ def sorted_alphanumeric(data):
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
     return sorted(data, key=alphanum_key)
 
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+embedding_model = SentenceTransformer('all-mpnet-base-v2')
 
-
-dir = "E:\\Project\\Dataset\\CwS\\mit039\\chunks\\"
-docs = "E:\\Project\\Dataset\\CwS\\mit039\\transcribed\\"
+dir = "D:\\Project\\Dataset\\CwS\\mit038\\chunks\\"
+docs = "D:\\Project\\Dataset\\CwS\\mit038\\transcribed\\"
 list_files = os.listdir(docs)
 for i in list_files:
     lst=[]
@@ -22,7 +21,7 @@ for i in list_files:
     chunk_file = sorted_alphanumeric(os.listdir(docs+i))
     for j in chunk_file:
         try:
-            file = open(f'{docs}{i}\\{j}',"r")
+            file = open(f'{docs}{i}\\{j}',"r", encoding="utf-8")
             text = file.read()
             lst.append(text)
             file.close() 
@@ -32,9 +31,8 @@ for i in list_files:
     for k in lst:
         vectors = embedding_model.encode(k)
         embeds.append(vectors)
-    print(embeds)
 
-    ac = AgglomerativeClustering(n_clusters = None, distance_threshold = 2.8)
+    ac = AgglomerativeClustering(n_clusters = None, distance_threshold = 2.6)
     agg_clusters = ac.fit_predict(embeds)
 
     clustered_text = {}
@@ -44,24 +42,26 @@ for i in list_files:
         clustered_text[cluster_label].append(chunk_file[l])
 
     # Print the text chunks in each cluster
-    # os.makedirs("E:\\Project\\Dataset\\CwS\\mit039\\combined\\"+ i)
-    # os.makedirs("E:\\Project\\Dataset\\CwS\\mit039\\transcribed_combined\\"+i)
-    # for cluster_label, chunks in clustered_text.items():
-    #     print(f"Cluster {cluster_label} contains:")
-    #     sound = []
-    #     with open(f"E:\\Project\\Dataset\\CwS\\mit039\\transcribed_combined\\{i}\\{cluster_label}.txt", 'w') as outfile:
-    #         for chunk in chunks:
-    #             with open(f"E:\\Project\\Dataset\\CwS\\mit039\\transcribed\\{i}\\{chunk}") as infile:
-    #                 for line in infile:
-    #                     outfile.write(line)
-    #             chunk = chunk.replace("trans_","")
-    #             chunk = chunk.removesuffix(".txt")
-    #             print(chunk)
-    #             sound.append(AudioSegment.from_file(f"{dir}{i}\\{chunk}", format="wav"))
-    #             combined = 0
-    #             for x in sound:
-    #                 combined += x 
-    #         file_handle = combined.export(f"E:\\Project\\Dataset\\CwS\\mit039\\combined\\{i}\\{cluster_label}.mp3", format="mp3")
+    os.makedirs("D:\\Project\\Dataset\\CwS\\mit038\\combined\\"+ i)
+    os.makedirs("D:\\Project\\Dataset\\CwS\\mit038\\transcribed_combined\\"+i)
+    for cluster_label, chunks in clustered_text.items():
+        print(f"Cluster {cluster_label} contains:")
+        sound = []
+        with open(f"D:\\Project\\Dataset\\CwS\\mit038\\transcribed_combined\\{i}\\{cluster_label}.txt", 'w', encoding="utf-8") as outfile:
+            for chunk in chunks:
+                with open(f"D:\\Project\\Dataset\\CwS\\mit038\\transcribed\\{i}\\{chunk}", encoding="utf-8") as infile:
+                    for line in infile:
+                        outfile.write(line)
+                chunk = chunk.replace("trans_","")
+                chunk = chunk.removesuffix(".txt")
+                print(chunk)
+                sound.append(AudioSegment.from_file(f"{dir}{i}\\{chunk}", format="wav"))
+                combined = 0
+                for x in sound:
+                    combined += x 
+            file_handle = combined.export(f"D:\\Project\\Dataset\\CwS\\mit038\\combined\\{i}\\{cluster_label}.mp3", format="mp3")
+            
+
     
 
 
