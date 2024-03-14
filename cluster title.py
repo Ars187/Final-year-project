@@ -74,7 +74,6 @@ for i in os.listdir(dir):
         file = open(f'{dir}{i}\\{j}',"r",encoding="utf-8")
         essay = file.read()
         kw_model = KeyBERT()
-        keywords = kw_model.extract_keywords(essay)
         keywords = kw_model.extract_keywords(essay, keyphrase_ngram_range=(1, 2), stop_words="english", use_maxsum=True, nr_candidates=20, top_n=5)
         print(keywords)
         
